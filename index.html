@@ -30,7 +30,7 @@
         <div class="landing-badge">Est. 2025</div>
         <h1 class="landing-title">
           <span class="title-line">Welcome to</span>
-          <span class="title-brand">MyReviewSite</span>
+          <span class="title-brand">MyReview</span>
         </h1>
         <p class="landing-subtitle">
           Honest reviews for games, movies, series &amp; books.<br/>
@@ -58,7 +58,10 @@
       <!-- Fixed header -->
       <header class="site-header">
         <div class="header-inner">
-          <button class="logo-btn" id="btn-logo">MyReviewSite</button>
+          <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+            <span></span><span></span><span></span>
+          </button>
+          <button class="logo-btn" id="btn-logo">MyReview</button>
           <nav class="header-nav">
             <button class="nav-filter active" data-cat="all">All</button>
             <button class="nav-filter" data-cat="games">Games</button>
@@ -66,9 +69,6 @@
             <button class="nav-filter" data-cat="series">Series</button>
             <button class="nav-filter" data-cat="books">Books</button>
           </nav>
-          <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
-            <span></span><span></span><span></span>
-          </button>
         </div>
       </header>
 
@@ -161,17 +161,12 @@
       <!-- Review content -->
       <div class="detail-content">
 
-        <!-- Hero: 3 columns — poster | title + rating | synopsis -->
+        <!-- Hero: 2 columns — poster+rating | title+meta+synopsis -->
         <div class="detail-hero">
 
-          <!-- Col 1: poster -->
-          <img class="detail-poster" id="detail-poster" src="" alt="" />
-
-          <!-- Col 2: badge, title, meta, rating -->
-          <div class="detail-info">
-            <div class="detail-category-badge" id="detail-cat-badge"></div>
-            <h1 class="detail-title" id="detail-title"></h1>
-            <div class="detail-meta" id="detail-meta"></div>
+          <!-- Col 1: poster + rating stacked -->
+          <div class="detail-poster-col">
+            <img class="detail-poster" id="detail-poster" src="" alt="" />
             <div class="detail-rating-box">
               <span class="rating-label">Overall Rating</span>
               <div class="rating-display">
@@ -184,10 +179,15 @@
             </div>
           </div>
 
-          <!-- Col 3: synopsis -->
-          <div class="detail-synopsis-col">
-            <h2 class="detail-section-title">Synopsis</h2>
-            <p id="detail-synopsis"></p>
+          <!-- Col 2: badge, title, meta, synopsis -->
+          <div class="detail-info">
+            <div class="detail-category-badge" id="detail-cat-badge"></div>
+            <h1 class="detail-title" id="detail-title"></h1>
+            <div class="detail-meta" id="detail-meta"></div>
+            <div class="detail-synopsis-col">
+              <h2 class="detail-section-title">Synopsis</h2>
+              <p id="detail-synopsis"></p>
+            </div>
           </div>
 
         </div>
@@ -196,6 +196,18 @@
         <div class="detail-section">
           <h2 class="detail-section-title">My Opinion</h2>
           <p class="detail-opinion" id="detail-opinion"></p>
+        </div>
+
+        <!-- Category ratings (hidden when no ratings data) -->
+        <div class="detail-section game-ratings-section" id="ratings-section" style="display:none">
+          <h2 class="detail-section-title" id="ratings-section-title">Ratings</h2>
+          <div class="game-ratings-grid" id="ratings-grid"></div>
+        </div>
+
+        <!-- Highlights -->
+        <div class="detail-section">
+          <h2 class="detail-section-title">Highlights</h2>
+          <ul class="detail-highlights" id="detail-highlights"></ul>
         </div>
 
         <!-- Official Site link -->
@@ -207,18 +219,6 @@
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
             </svg>
           </a>
-        </div>
-
-        <!-- Highlights -->
-        <div class="detail-section">
-          <h2 class="detail-section-title">Highlights</h2>
-          <ul class="detail-highlights" id="detail-highlights"></ul>
-        </div>
-
-        <!-- Game-specific ratings (hidden when not applicable) -->
-        <div class="detail-section game-ratings-section" id="game-ratings-section" style="display:none">
-          <h2 class="detail-section-title">Game Ratings</h2>
-          <div class="game-ratings-grid" id="game-ratings-grid"></div>
         </div>
 
       </div>

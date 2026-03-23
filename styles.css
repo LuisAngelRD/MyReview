@@ -158,7 +158,8 @@ ul { list-style: none; }
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  line-height: 1.05;
+  line-height: 1.15;
+  padding-bottom: 0.12em;
   text-shadow: none;
 }
 
@@ -669,13 +670,21 @@ ul { list-style: none; }
   margin-top: -160px;
 }
 
-/* Hero: 3-column grid — poster | info | synopsis */
+/* Hero: 2-column grid — poster+rating | info+synopsis */
 .detail-hero {
   display: grid;
-  grid-template-columns: 180px minmax(200px, 280px) 1fr;
+  grid-template-columns: 180px 1fr;
   gap: 2rem;
   align-items: start;
   margin-bottom: 2.5rem;
+}
+
+/* Col 1: poster stacked on top of rating box */
+.detail-poster-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: -40px; /* lift to overlap the banner */
 }
 
 .detail-poster {
@@ -685,17 +694,15 @@ ul { list-style: none; }
   border-radius: var(--radius-md);
   border: 2px solid var(--border);
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  /* slight lift so it overlaps the banner */
-  margin-top: -40px;
 }
 
 .detail-info {
   padding-top: 0.25rem;
 }
 
-/* Synopsis column */
+/* Synopsis — now inside detail-info, below meta */
 .detail-synopsis-col {
-  padding-top: 0.25rem;
+  margin-top: 1.25rem;
 }
 
 .detail-synopsis-col p {
@@ -735,14 +742,14 @@ ul { list-style: none; }
 
 /* Rating box */
 .detail-rating-box {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   gap: 0.5rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 1rem 1.25rem;
-  min-width: 180px;
+  width: 100%;
 }
 
 .rating-label {
@@ -908,13 +915,23 @@ ul { list-style: none; }
   transition: width 1s cubic-bezier(0.4,0,0.2,1) 0.4s;
 }
 
-/* Colors per metric */
+/* Colors per metric — games */
 .game-rating-bar.gameplay   { background: #7c6af7; }
 .game-rating-bar.sound      { background: #4fc3f7; }
 .game-rating-bar.soundtrack { background: #f472b6; }
 .game-rating-bar.characters { background: #34d399; }
 .game-rating-bar.narrative  { background: #fb923c; }
 .game-rating-bar.animations { background: #a78bfa; }
+
+/* Colors per metric — movies & series */
+.game-rating-bar.cast       { background: #f59e0b; }
+.game-rating-bar.vfx        { background: #22d3ee; }
+.game-rating-bar.script     { background: #4ade80; }
+
+/* Colors per metric — books */
+.game-rating-bar.originality { background: #c084fc; }
+.game-rating-bar.world       { background: #2dd4bf; }
+.game-rating-bar.pacing      { background: #f97316; }
 
 /* ============================================================
    UTILITIES — ANIMATIONS
@@ -951,15 +968,10 @@ ul { list-style: none; }
 
   .detail-hero {
     grid-template-columns: 140px 1fr;
-    grid-template-rows: auto auto;
   }
 
-  /* Synopsis moves below the two top columns on tablet */
-  .detail-synopsis-col {
-    grid-column: 1 / -1;
-  }
-
-  .detail-poster { width: 140px; margin-top: -20px; }
+  .detail-poster-col { margin-top: -20px; }
+  .detail-poster { width: 140px; }
 
   .detail-content {
     padding: 0 1rem 3rem;
@@ -983,9 +995,8 @@ ul { list-style: none; }
     grid-template-columns: 1fr;
   }
 
-  .detail-poster { width: 120px; margin-top: 0; }
-
-  .detail-rating-box { min-width: 0; width: 100%; }
+  .detail-poster-col { margin-top: 0; }
+  .detail-poster { width: 120px; }
 
   .game-ratings-grid { grid-template-columns: repeat(2, 1fr); }
 }

@@ -9,7 +9,7 @@
    1. MOCK DATA — simulated review database.
    Each review has: id, category, title, year, poster, banner,
    synopsis, opinion (personal take), highlights, rating,
-   officialLink, officialLabel, and optionally gameRatings.
+   officialLink, officialLabel, and optionally ratings.
 ============================================================ */
 const reviews = [
   /* ---- GAMES ---- */
@@ -31,7 +31,7 @@ const reviews = [
     rating: 9.5,
     officialLink:  'https://store.steampowered.com/app/1245620/ELDEN_RING/',
     officialLabel: 'View on Steam',
-    gameRatings: {
+    ratings: {
       Gameplay:   9.8,
       Sound:      8.5,
       Soundtrack: 9.0,
@@ -45,7 +45,7 @@ const reviews = [
     category: 'games',
     title: 'Hollow Knight',
     year: 2017,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/2/25/Hollow_Knight_cover.jpg',
+    poster:  'https://store-images.s-microsoft.com/image/apps.58959.13847644057609868.8865d2a2-5e11-4424-85ce-1db30a161bd9.41ca3834-331c-4d34-b2c9-7dfe318fd168',
     banner:  'https://cdn.akamai.steamstatic.com/steam/apps/367520/library_hero.jpg',
     synopsis: 'An indie metroidvania by Team Cherry set in a melancholic underground world of insects. Hollow Knight blends intricate exploration, precise combat, and an unforgettable soundtrack into a remarkably cohesive experience.',
     opinion: 'I went into Hollow Knight expecting a decent indie game. I came out weeks later having experienced one of the best games ever made at any budget. The atmosphere is unlike anything else — sad, beautiful, and strangely comforting. The map design is so dense that discovering a new area feels genuinely thrilling. And Christopher Larkin\'s score is hauntingly perfect. Team Cherry set an almost impossible standard with their debut.',
@@ -58,7 +58,7 @@ const reviews = [
     rating: 9.2,
     officialLink:  'https://store.steampowered.com/app/367520/Hollow_Knight/',
     officialLabel: 'View on Steam',
-    gameRatings: {
+    ratings: {
       Gameplay:   9.0,
       Sound:      9.5,
       Soundtrack: 9.8,
@@ -70,22 +70,22 @@ const reviews = [
   {
     id: 3,
     category: 'games',
-    title: 'The Legend of Zelda: Breath of the Wild',
-    year: 2017,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/c/c6/The_Legend_of_Zelda_Breath_of_the_Wild.jpg',
-    banner:  'https://assets.nintendo.com/image/upload/c_fill,w_1200/q_auto:best/f_auto/ncom/en_US/games/switch/t/the-legend-of-zelda-breath-of-the-wild-switch/hero',
-    synopsis: 'Nintendo reinvented their flagship franchise with an open world that rewards curiosity at every turn. Breath of the Wild sets a new benchmark for adventure game design by giving players total freedom from the very first minutes.',
-    opinion: 'BotW was a revelation. I remember spending my first two hours just climbing a single mountain and watching the physics interact with the environment — no tutorials, no hand-holding. Nintendo trusted the player completely. It\'s not a perfect game; the weapon durability system can be frustrating and the narrative is thin. But as a sandbox for exploration and creative problem-solving, nothing else comes close.',
+    title: 'Red Dead Redemption 2',
+    year: 2018,
+    poster:  'https://m.media-amazon.com/images/I/71xnh5WM+GL._AC_UF894,1000_QL80_.jpg',
+    banner:  'https://m.media-amazon.com/images/I/71HEZBorXiL.jpg',
+    synopsis: 'Set in 1899 at the twilight of the American frontier, Red Dead Redemption 2 follows Arthur Morgan, a senior member of the Van der Linde gang, as the era of outlaws comes to an inevitable end. A sprawling epic about loyalty, honor, and what it means to be a good man in an unforgiving world.',
+    opinion: 'Red Dead Redemption 2 is one of the most ambitious games ever made, and arguably Rockstar\'s finest achievement. Arthur Morgan stands among gaming\'s greatest protagonists — morally complex, achingly human, and impossible to forget. The world of 1899 America is rendered with extraordinary detail: horses leave tracks in snow, NPCs have daily routines, and every town feels lived-in. The story builds slowly, but when it lands, it lands like a freight train. The final chapters left me genuinely emotional in a way few games ever have.',
     highlights: [
-      'Environmental physics and chemistry creatively integrated into gameplay.',
-      'Total freedom from the very first minutes with no forced path.',
-      'Clever and varied shrine puzzle design throughout.',
-      'Art direction blending cel shading with naturalistic realism.',
+      'Arthur Morgan: one of gaming\'s most complex and emotionally compelling protagonists.',
+      'Unprecedented open world detail — a living, breathing recreation of 1899 America.',
+      'A story that builds methodically and pays off with extraordinary emotional weight.',
+      'Dual narrative structure that connects brilliantly to the events of the first game.',
     ],
     rating: 9.3,
-    officialLink:  'https://www.nintendo.com/en-gb/Games/Nintendo-Switch-games/The-Legend-of-Zelda-Breath-of-the-Wild-1173609.html',
-    officialLabel: 'View on Nintendo',
-    gameRatings: {
+    officialLink:  'https://www.rockstargames.com/reddeadredemption2/',
+    officialLabel: 'View on Rockstar',
+    ratings: {
       Gameplay:   9.7,
       Sound:      8.8,
       Soundtrack: 8.5,
@@ -99,40 +99,56 @@ const reviews = [
   {
     id: 4,
     category: 'movies',
-    title: 'Dune: Part Two',
-    year: 2024,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/5/52/Dune_Part_Two_poster.jpeg',
-    banner:  'https://m.media-amazon.com/images/M/MV5BNTc0YmQxMjEtODI5MC00NjFiLTlkMWUtOGQ5NjFjYWUyZWFiXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_FMjpg_UX1920_.jpg',
-    synopsis: 'Denis Villeneuve concludes his epic adaptation of Frank Herbert with a visually stunning and emotionally devastating second part. The transformation of Paul Atreides into a messianic figure is executed with surgical precision.',
-    opinion: 'Part Two is a rare case where a sequel surpasses the original. Villeneuve doubles down on the spectacle but never loses sight of the tragedy at the story\'s core. The black-and-white sequence on Giedi Prime is one of the most striking visual choices I\'ve seen in recent blockbuster cinema. Zendaya finally gets room to breathe, and Austin Butler is genuinely terrifying as Feyd-Rautha. A modern epic in every sense.',
+    title: 'How to train your dragon',
+    year: 2010,
+    poster:  'https://moviepostermexico.com/cdn/shop/products/how_to_train_your_dragon_ver6_xlg_1024x1024@2x.jpg?v=1596764856',
+    banner:  'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiRrdjf5PB1VBV2N1FjZO0fO86_q86gYpo8xH_1H-2IrS0tBzYE2x5lVoI2mh4dPtYTzymxARJqIEt_uyvS1OLxnXqaDH5a1sfKojkRHhNfZDiHQ3bgIJGDoakjCCt3wWH1cqKPhvN__gA/w1200-h630-p-k-no-nu/Screen+shot+2010-09-04+at+11.42.04+AM.png',
+    synopsis: 'In the Viking village of Berk, young Hiccup goes against tradition when he befriends Toothless, a rare and wounded Night Fury dragon feared by all. A DreamWorks animated adventure about courage, empathy, and the power of challenging inherited beliefs.',
+    opinion: 'How to Train Your Dragon is one of those rare animated films that works on every level simultaneously. As a children\'s adventure it\'s thrilling; as an adult it\'s surprisingly moving. The bond between Hiccup and Toothless is built almost entirely through physical performance and John Powell\'s extraordinary score — very little dialogue is needed, and none is wasted. The flight sequences have a weightlessness and joy that genuinely took my breath away. DreamWorks rarely matched this level of craft again.',
     highlights: [
-      'Greig Fraser\'s black-and-white cinematography for Giedi Prime — breathtaking.',
-      'Hans Zimmer delivers one of his best scores in years.',
-      'Standout performances from Zendaya and Austin Butler.',
-      'Epic scale without losing the emotional intimacy of its characters.',
+      'John Powell\'s score — soaring, emotional, and completely essential to the film.',
+      'The Hiccup–Toothless relationship told largely through physical performance.',
+      'Flight sequences that convey genuine freedom and wonder.',
+      'A surprisingly layered message about empathy and breaking cycles of fear.',
     ],
     rating: 9.0,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    ratings: {
+      Soundtrack: 9.5,
+      Cast:       9.0,
+      Narrative:  8.8,
+      Characters: 8.5,
+      VFX:        9.7,
+      Script:     8.6,
+    },
   },
   {
     id: 5,
     category: 'movies',
-    title: 'Everything Everywhere All at Once',
-    year: 2022,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/b/b9/Everything_Everywhere_All_at_Once_poster.jpg',
-    banner:  'https://m.media-amazon.com/images/M/MV5BYTdiOTIyZTQtNmQ1OS00NjZlLWIyMTgtYzk5Y2M3ZDVmMDk1XkEyXkFqcGdeQXVyMTAyOTE2ODg0._V1_FMjpg_UX1920_.jpg',
-    synopsis: 'The Daniels craft a multiverse masterpiece centered on a laundromat and a mother-daughter relationship. A film that blends absurd chaos with genuine tenderness and loving references to Hong Kong cinema.',
-    opinion: 'I cried three times. I laughed uncontrollably twice. And I sat in silence for ten minutes after the credits rolled, just thinking. EEAAO shouldn\'t work — it\'s too chaotic, too weird, too everything. And yet it is one of the most emotionally honest films I\'ve seen in years. Michelle Yeoh carries it all with a gravity that makes every absurd moment feel earned. It deserved every Oscar it got, and probably a few more.',
+    title: 'Real Steel',
+    year: 2011,
+    poster:  'https://pics.filmaffinity.com/Acero_puro-582337760-large.jpg',
+    banner:  'https://www.findelahistoria.com/web/wp-content/uploads/2022/01/real-steel-banner-peli.jpg',
+    synopsis: 'In a near-future America where human boxing has been replaced by robot fighting, a down-on-his-luck promoter reconnects with his estranged son through an underdog sparring bot named Atom. A crowd-pleasing sports drama wrapped in a sleek sci-fi package.',
+    opinion: 'Real Steel knows exactly what it is and commits to it completely — and that commitment is what makes it work. Hugh Jackman and Dakota Goyo have a natural chemistry that anchors the film\'s more sentimental moments, and the robot fights are genuinely exciting, staged with surprising physicality. It\'s Rocky with robots, and there\'s nothing wrong with that. I left the theater with a smile on my face and a fist in the air. Sometimes that\'s all you need.',
     highlights: [
-      'Michelle Yeoh in the performance of her career.',
-      'Frenetic editing that is completely intentional and purposeful.',
-      'An emotional message that transcends the visual chaos.',
-      'Seamless genre blending — action, comedy, and drama without friction.',
+      'Hugh Jackman and Dakota Goyo deliver a believable and touching father-son dynamic.',
+      'Robot combat sequences staged with impressive physicality and real weight.',
+      'Atom\'s design and movement make him a genuinely endearing character.',
+      'An unapologetically feel-good underdog arc executed with conviction.',
     ],
     rating: 9.4,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    ratings: {
+      Soundtrack: 8.5,
+      Cast:       9.8,
+      Narrative:  9.2,
+      Characters: 9.5,
+      VFX:        8.0,
+      Script:     9.3,
+    },
   },
   {
     id: 6,
@@ -152,35 +168,51 @@ const reviews = [
     rating: 9.1,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    ratings: {
+      Soundtrack: 9.7,
+      Cast:       9.5,
+      Narrative:  9.2,
+      Characters: 9.0,
+      VFX:        9.4,
+      Script:     9.1,
+    },
   },
 
   /* ---- SERIES ---- */
   {
     id: 7,
     category: 'series',
-    title: 'Severance',
-    year: 2022,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/7/77/Severance_TV_series.png',
-    banner:  'https://m.media-amazon.com/images/M/MV5BMTQ0NjQ2MjQ0OF5BMl5BanBnXkFtZTgwMzY5NzE3NjM@._V1_FMjpg_UX1920_.jpg',
-    synopsis: 'Apple TV+ delivers one of the most original series of the last decade. Severance explores workplace dissociation literally: employees of Lumon Industries have their memories surgically separated between work and personal life.',
-    opinion: 'Severance is the most uncomfortable I\'ve felt watching television in years — and I mean that as the highest compliment. The show weaponizes office aesthetics and corporate language into something genuinely sinister. Ben Stiller\'s direction is meticulous in the best possible way; every hallway, every fluorescent light feels intentional. Adam Scott is devastating. And that season finale leaves you gasping. Cannot wait for what comes next.',
+    title: 'Daredevil',
+    year: 2015,
+    poster:  'https://moviepostermexico.com/cdn/shop/products/daredevil_ver4_xxlg_1024x1024@2x.jpg?v=1572365092',
+    banner:  'https://static0.srcdn.com/wordpress/wp-content/uploads/Daredevil2.jpg?w=1200&h=628&fit=crop',
+    synopsis: 'Matt Murdock, a blind attorney by day, becomes Daredevil — a vigilante crime fighter using his enhanced senses to protect the Hell\'s Kitchen neighborhood of New York City. Marvel and Netflix\'s acclaimed series redefined what superhero television could be.',
+    opinion: 'Daredevil\'s first season is one of the best things Marvel has ever produced, full stop. The show earns its darkness without ever becoming gratuitous, and the chemistry between Charlie Cox and Vincent D\'Onofrio is extraordinary. D\'Onofrio\'s Wilson Fisk is one of the genre\'s great villains — menacing, tragic, and disturbingly human. The hallway fight in episode two set a new standard for action choreography on television that most big-budget films still haven\'t matched. This is what superhero storytelling looks like when it takes itself seriously.',
     highlights: [
-      'Ben Stiller\'s direction surprises with its visual precision and pacing.',
-      'Adam Scott in the best role of his career.',
-      'Every episode ratchets tension in a perfectly calculated way.',
-      'Kafkaesque production design that is deeply unsettling.',
+      'Vincent D\'Onofrio delivers one of Marvel\'s all-time great villain performances as Kingpin.',
+      'The hallway fight scene in episode two — a landmark in TV action choreography.',
+      'Charlie Cox brings unexpected vulnerability and physicality to Matt Murdock.',
+      'A grounded, street-level tone that makes the stakes feel genuinely personal.',
     ],
     rating: 9.3,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    ratings: {
+      Soundtrack: 9.0,
+      Cast:       9.5,
+      Narrative:  9.6,
+      Characters: 9.3,
+      VFX:        8.5,
+      Script:     9.4,
+    },
   },
   {
     id: 8,
     category: 'series',
     title: 'The Bear',
     year: 2022,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/0/0e/The_Bear_TV_series_poster.png',
-    banner:  'https://m.media-amazon.com/images/M/MV5BZGEwNTNjYTMtY2Q0Ni00NjhiLWI4YmYtMTY5NzQ3ZTlmZjYxXkEyXkFqcGdeQXVyMjkwOTAyMDU@._V1_FMjpg_UX1920_.jpg',
+    poster:  'https://image.tmdb.org/t/p/original/eKfVzzEazSIjJMrw9ADa2x8ksLz.jpg',
+    banner:  'https://www.thebanner.org/sites/default/files/styles/article_detail_header/public/2022-11/the%20Bear.jpg?itok=dA0sZo6W',
     synopsis: 'A fine-dining chef returns to Chicago to manage his late brother\'s sandwich restaurant. The Bear captures the chaos, beauty, and trauma of professional kitchens like no other series ever has.',
     opinion: 'The Bear is television that physically affects you. After watching the "Review" episode — 22 unbroken minutes of a kitchen in full meltdown — I had to pause and take a breath. It\'s not comfortable viewing, but it\'s necessary. Jeremy Allen White\'s performance is raw and restrained in equal measure. The show understands trauma, family, and the cost of excellence in a way that feels deeply personal. Season two is even better.',
     highlights: [
@@ -192,46 +224,69 @@ const reviews = [
     rating: 9.5,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    ratings: {
+      Soundtrack: 8.8,
+      Cast:       9.8,
+      Narrative:  9.4,
+      Characters: 9.6,
+      VFX:        8.0,
+      Script:     9.2,
+    },
   },
   {
     id: 9,
     category: 'series',
-    title: 'Shogun (2024)',
-    year: 2024,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/b/b8/Shogun_2024_TV_series.jpg',
-    banner:  'https://m.media-amazon.com/images/M/MV5BZWQyNmZmYjMtMzBmOS00OTNhLTlkNjktNDhiNGRiNTZiZmE3XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_FMjpg_UX1920_.jpg',
-    synopsis: 'FX\'s remake is one of the most pleasant surprises of the year. The story of navigator John Blackthorne in feudal Japan is now told with unprecedented cultural depth, centering the Japanese perspective above all else.',
-    opinion: 'I was skeptical going in — remakes of classics rarely justify their existence. Shōgun 2024 does more than justify itself; it surpasses the original by treating its Japanese characters as full protagonists rather than a backdrop. Hiroyuki Sanada, who also produced the show, gives a performance of extraordinary subtlety and weight. The decision to use subtitles not just for accessibility but as a narrative tool — withholding translations at key moments — is a stroke of genius.',
+    title: 'The Last of Us',
+    year: 2023,
+    poster:  'https://www.infobae.com/new-resizer/6HfhpZzw-AOsvClBmuWW8azGzOQ=/arc-anglerfish-arc2-prod-infobae/public/ILPHUU4CWBCNDNPG4EVLMFBW3Y.jfif',
+    banner:  'https://i0.wp.com/imgs.hipertextual.com/wp-content/uploads/2022/11/the-last-of-us-hbo-portada.jpg?fit=2160%2C1501&quality=70&strip=all&ssl=1',
+    synopsis: 'Twenty years after a fungal pandemic devastates civilization, hardened smuggler Joel is tasked with escorting a teenage girl named Ellie across a brutal post-apocalyptic America. HBO\'s adaptation elevates the beloved video game into one of the finest dramas ever made for television.',
+    opinion: 'The Last of Us had no right to be this good. Video game adaptations have a famously poor track record, yet Craig Mazin and Neil Druckmann managed to translate every ounce of the original\'s emotional power into a new medium. Pedro Pascal and Bella Ramsey are extraordinary together — their bond builds slowly and feels completely earned. Episode three, "Long Long Time," is a standalone masterpiece that left me unable to speak. This isn\'t just a great video game adaptation — it\'s simply great television.',
     highlights: [
-      'Hiroyuki Sanada — also a producer — delivers a colossally layered performance.',
-      'Historical and cultural rigor visible in every production detail.',
-      'Subtitles used intentionally as a narrative device, not just accessibility.',
-      'Unexpectedly emotional and cathartic season finale.',
+      'Pedro Pascal and Bella Ramsey — a central duo with rare, unforced chemistry.',
+      '"Long Long Time" (episode three) stands as one of television\'s finest single episodes.',
+      'The adaptation expands the source material while remaining faithful to its emotional core.',
+      'Production design that renders the post-apocalyptic world with stunning, lived-in detail.',
     ],
     rating: 9.2,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    ratings: {
+      Soundtrack: 9.3,
+      Cast:       9.7,
+      Narrative:  9.5,
+      Characters: 9.4,
+      VFX:        8.8,
+      Script:     9.2,
+    },
   },
 
   /* ---- BOOKS ---- */
   {
     id: 10,
     category: 'books',
-    title: 'The Name of the Wind',
-    year: 2007,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/4/44/TheNameoftheWind_cover.jpg',
-    banner:  'https://i.imgur.com/HEMsEzl.jpg',
-    synopsis: 'Patrick Rothfuss debuts with a fantasy novel that redefines the literary standard of the genre. Kvothe\'s story, narrated in first person, has an almost poetic prose and characters of extraordinary depth.',
-    opinion: 'The Name of the Wind is the book that made me fall back in love with fantasy after years of feeling the genre had nothing new to offer. Rothfuss writes prose that you slow down to re-read not because it\'s difficult, but because it\'s beautiful. Kvothe is a flawed, compelling narrator — you\'re never quite sure how much of his tale to believe. The magic system (Sympathy) is one of the most coherent and original I\'ve encountered. My only frustration is that book three still doesn\'t exist.',
+    title: 'The Stranger',
+    year: 1942,
+    poster:  'https://m.media-amazon.com/images/I/61qtGqfgUjL._AC_UF1000,1000_QL80_.jpg',
+    banner:  'https://mir-s3-cdn-cf.behance.net/project_modules/max_3840_webp/c4f70d171322483.646cebaf777fc.png',
+    synopsis: 'Albert Camus\'s existentialist masterpiece follows Meursault, an emotionally detached man living in Algeria who commits a senseless murder and faces trial — judged less for his crime than for his refusal to conform to society\'s emotional expectations. A short, devastating, and endlessly debated novel.',
+    opinion: 'The Stranger is the kind of book that feels different every time you return to it. Meursault is one of literature\'s most frustrating and fascinating protagonists — not because he is evil, but because he is indifferent, and the world cannot forgive him for it. Camus uses his blunt, stripped-down prose as a mirror: the discomfort you feel reading it is the discomfort of recognizing something true. It took me an afternoon to read and weeks to stop thinking about. That\'s the mark of a truly essential work.',
     highlights: [
-      'Elegant, literary prose unusual for the fantasy genre.',
-      'Original and internally consistent magic system (Sympathy).',
-      'Masterfully executed frame-narrative storytelling structure.',
-      'Gradual worldbuilding that reveals itself without info-dumps.',
+      'Meursault: one of literature\'s most provocative and endlessly debated narrators.',
+      'Camus\'s minimalist prose communicates an entire philosophy through what it omits.',
+      'A trial scene that doubles as a meditation on social conformity and moral judgment.',
+      'Brief, dense, and completely impossible to forget — perfect in its economy.',
     ],
     rating: 9.0,
-    officialLink:  'https://www.amazon.com/s?k=The+Name+of+the+Wind+Rothfuss',
+    officialLink:  'https://www.amazon.com/s?k=The+Stranger+Albert+Camus',
     officialLabel: 'Find on Amazon',
+    ratings: {
+      Narrative:   9.5,
+      Characters:  9.2,
+      Originality: 9.0,
+      World:       9.3,
+      Pacing:      8.5,
+    },
   },
   {
     id: 11,
@@ -251,25 +306,39 @@ const reviews = [
     rating: 9.7,
     officialLink:  'https://www.amazon.com/s?k=Dune+Frank+Herbert',
     officialLabel: 'Find on Amazon',
+    ratings: {
+      Narrative:   9.5,
+      Characters:  9.0,
+      Originality: 9.8,
+      World:       10.0,
+      Pacing:      7.5,
+    },
   },
   {
     id: 12,
     category: 'books',
-    title: 'Project Hail Mary',
-    year: 2021,
-    poster:  'https://upload.wikimedia.org/wikipedia/en/0/0c/Project_Hail_Mary_cover.jpg',
-    banner:  'https://i.imgur.com/YjLVrA2.jpg',
-    synopsis: 'Andy Weir returns with a hard science fiction novel that blends scientific rigor and light humor with a story of impossible friendship in deep space. Practically impossible to put down once you start.',
-    opinion: 'Project Hail Mary is the most fun I\'ve had reading a book in years. Weir has this gift for making hard science feel like a game — every problem Ryland Grace faces is a puzzle you want to solve alongside him. And then Rocky shows up, and the book transforms into something unexpectedly moving. I didn\'t think I could get emotionally attached to a character described through echolocation and smell. I was wrong. The ending genuinely made me smile for the rest of the day.',
+    title: 'Metamorphosis',
+    year: 1915,
+    poster:  'https://images.penguinrandomhouse.com/cover/9780805210576',
+    banner:  'https://i.imgur.com/KQMmNvt.jpg',
+    synopsis: 'Franz Kafka\'s iconic novella follows Gregor Samsa, a traveling salesman who wakes one morning transformed into a monstrous insect. A deeply unsettling and darkly comic exploration of alienation, family obligation, and the dehumanizing nature of modern life.',
+    opinion: 'Metamorphosis manages to be both completely absurd and utterly earnest — and that tension is what makes it so devastating. Kafka never explains the transformation, never allows the reader comfort, and the family\'s gradual abandonment of Gregor is rendered with a cold precision that lingers long after the final page. What\'s most remarkable is how darkly funny it occasionally is; the horror and the comedy are completely inseparable. Kafka diagnosed the modern condition with surgical accuracy more than a century ago. We\'re still catching up.',
     highlights: [
-      'Accessible hard science that educates without feeling like a lecture.',
-      'A mid-book plot twist that completely reframes the entire story.',
-      'Rocky: one of the best-written alien characters in recent fiction.',
-      'An infectiously optimistic tone about the nature of humanity (and beyond).',
+      'The transformation treated as mundane fact — Kafka\'s greatest and most disquieting narrative choice.',
+      'A relentless and uncomfortably honest portrait of family dynamics under pressure.',
+      'Dark humor woven so naturally into the horror that the two become inseparable.',
+      'A compact, precise structure that wastes not a single word or image.',
     ],
     rating: 9.1,
     officialLink:  'https://www.amazon.com/s?k=Project+Hail+Mary+Andy+Weir',
     officialLabel: 'Find on Amazon',
+    ratings: {
+      Narrative:   9.3,
+      Characters:  9.5,
+      Originality: 9.0,
+      World:       8.8,
+      Pacing:      9.7,
+    },
   },
 ];
 
@@ -334,8 +403,9 @@ const ui = {
   detailOfficialLink: $('detail-official-link'),
   detailOfficialLabel:$('detail-official-label'),
   detailHighlights:   $('detail-highlights'),
-  gameRatingsSection: $('game-ratings-section'),
-  gameRatingsGrid:    $('game-ratings-grid'),
+  ratingsSection:      $('ratings-section'),
+  ratingsSectionTitle: $('ratings-section-title'),
+  ratingsGrid:         $('ratings-grid'),
 };
 
 
@@ -369,14 +439,14 @@ function navigateTo(viewName) {
 /** Creates random floating particles in the background */
 function initParticles() {
   const container = $('particles');
-  const count = 28;
+  const count = 55;
 
   for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
 
     // Random size and position
-    const size = Math.random() * 4 + 2;
+    const size = Math.random() * 7 + 3;
     p.style.cssText = `
       width: ${size}px;
       height: ${size}px;
@@ -591,12 +661,12 @@ function showDetail(id) {
     .map(h => `<li>${h}</li>`)
     .join('');
 
-  // --- Game ratings (only for games) ---
-  if (review.category === 'games' && review.gameRatings) {
-    ui.gameRatingsSection.style.display = 'block';
-    ui.gameRatingsGrid.innerHTML = '';
+  // --- Category ratings ---
+  if (review.ratings) {
+    ui.ratingsSection.style.display = 'block';
+    ui.ratingsGrid.innerHTML = '';
 
-    Object.entries(review.gameRatings).forEach(([key, val]) => {
+    Object.entries(review.ratings).forEach(([key, val]) => {
       const item = document.createElement('div');
       item.className = 'game-rating-item';
 
@@ -608,15 +678,15 @@ function showDetail(id) {
         </div>
       `;
 
-      ui.gameRatingsGrid.appendChild(item);
+      ui.ratingsGrid.appendChild(item);
     });
 
-    // Animate game bars
+    // Animate bars
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        ui.gameRatingsGrid.querySelectorAll('.game-rating-bar').forEach(bar => {
+        ui.ratingsGrid.querySelectorAll('.game-rating-bar').forEach(bar => {
           const key = bar.classList[1];
-          const val = review.gameRatings[capitalizeFirst(key)];
+          const val = review.ratings[capitalizeFirst(key)];
           if (val !== undefined) {
             bar.style.width = `${(val / 10) * 100}%`;
           }
@@ -624,7 +694,7 @@ function showDetail(id) {
       });
     });
   } else {
-    ui.gameRatingsSection.style.display = 'none';
+    ui.ratingsSection.style.display = 'none';
   }
 
   navigateTo('detail');
@@ -647,9 +717,9 @@ ui.btnEnter.addEventListener('click', () => {
   updateSidebarStats();
 });
 
-/** Header: logo → returns to home */
+/** Header: logo → returns to landing */
 ui.btnLogo.addEventListener('click', () => {
-  navigateTo('home');
+  navigateTo('landing');
 });
 
 /** Header: category filters */
