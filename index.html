@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyReviewSite</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ========================================================
+       SPA ROOT — all views are rendered here. -->
+  <div id="app">
+
+    <!-- =====================================================
+         VIEW 1: LANDING PAGE
+    ===================================================== -->
+    <section id="view-landing" class="view active">
+      <!-- Animated background particles -->
+      <div class="particles" id="particles"></div>
+
+      <!-- Parallax layer with gradient -->
+      <div class="landing-bg parallax-bg"></div>
+
+      <div class="landing-content">
+        <div class="landing-badge">Est. 2025</div>
+        <h1 class="landing-title">
+          <span class="title-line">Welcome to</span>
+          <span class="title-brand">MyReviewSite</span>
+        </h1>
+        <p class="landing-subtitle">
+          Honest reviews for games, movies, series &amp; books.<br/>
+          Curated by passion, not algorithms.
+        </p>
+        <button class="btn-cta" id="btn-enter">
+          <span>Let's go</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Scroll hint -->
+      <div class="scroll-hint">
+        <div class="scroll-dot"></div>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         VIEW 2: HOME — review catalog
+    ===================================================== -->
+    <section id="view-home" class="view">
+
+      <!-- Fixed header -->
+      <header class="site-header">
+        <div class="header-inner">
+          <button class="logo-btn" id="btn-logo">MyReviewSite</button>
+          <nav class="header-nav">
+            <button class="nav-filter active" data-cat="all">All</button>
+            <button class="nav-filter" data-cat="games">Games</button>
+            <button class="nav-filter" data-cat="movies">Movies</button>
+            <button class="nav-filter" data-cat="series">Series</button>
+            <button class="nav-filter" data-cat="books">Books</button>
+          </nav>
+          <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Main layout -->
+      <div class="home-layout">
+
+        <!-- Collapsible left sidebar -->
+        <aside class="sidebar" id="sidebar">
+          <div class="sidebar-inner">
+            <h2 class="sidebar-title">Categories</h2>
+            <ul class="sidebar-menu">
+              <li><button class="sidebar-item active" data-cat="all">
+                <span class="sidebar-icon">✦</span> All Reviews
+              </button></li>
+              <li><button class="sidebar-item" data-cat="games">
+                <span class="sidebar-icon">🎮</span> Games
+                <span class="sidebar-count" id="count-games">0</span>
+              </button></li>
+              <li><button class="sidebar-item" data-cat="movies">
+                <span class="sidebar-icon">🎬</span> Movies
+                <span class="sidebar-count" id="count-movies">0</span>
+              </button></li>
+              <li><button class="sidebar-item" data-cat="series">
+                <span class="sidebar-icon">📺</span> Series
+                <span class="sidebar-count" id="count-series">0</span>
+              </button></li>
+              <li><button class="sidebar-item" data-cat="books">
+                <span class="sidebar-icon">📚</span> Books
+                <span class="sidebar-count" id="count-books">0</span>
+              </button></li>
+            </ul>
+
+            <div class="sidebar-divider"></div>
+
+            <div class="sidebar-stats">
+              <h3>Stats</h3>
+              <div class="stat-row"><span>Total reviews</span><strong id="stat-total">0</strong></div>
+              <div class="stat-row"><span>Avg. rating</span><strong id="stat-avg">0</strong></div>
+              <div class="stat-row"><span>Top rated</span><strong id="stat-top">—</strong></div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Overlay to close sidebar on mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- Main content -->
+        <main class="home-main">
+
+          <!-- Featured section / Hero carousel -->
+          <div class="section-header">
+            <h2 class="section-title" id="section-label">All Reviews</h2>
+            <div class="carousel-controls">
+              <button class="carousel-btn" id="carousel-prev" aria-label="Previous">&#8592;</button>
+              <button class="carousel-btn" id="carousel-next" aria-label="Next">&#8594;</button>
+            </div>
+          </div>
+
+          <!-- Reviews carousel -->
+          <div class="carousel-wrapper">
+            <div class="carousel-track" id="carousel-track"></div>
+          </div>
+
+          <!-- Grid of all filtered reviews -->
+          <div class="section-header" style="margin-top:3rem">
+            <h2 class="section-title">Browse</h2>
+          </div>
+          <div class="reviews-grid" id="reviews-grid"></div>
+
+        </main>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         VIEW 3: REVIEW DETAIL
+    ===================================================== -->
+    <section id="view-detail" class="view">
+
+      <!-- Full-width top banner with downward blur -->
+      <div class="detail-banner" id="detail-banner">
+        <div class="detail-banner-blur"></div>
+        <button class="back-btn" id="btn-back">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back
+        </button>
+      </div>
+
+      <!-- Review content -->
+      <div class="detail-content">
+
+        <!-- Hero: 3 columns — poster | title + rating | synopsis -->
+        <div class="detail-hero">
+
+          <!-- Col 1: poster -->
+          <img class="detail-poster" id="detail-poster" src="" alt="" />
+
+          <!-- Col 2: badge, title, meta, rating -->
+          <div class="detail-info">
+            <div class="detail-category-badge" id="detail-cat-badge"></div>
+            <h1 class="detail-title" id="detail-title"></h1>
+            <div class="detail-meta" id="detail-meta"></div>
+            <div class="detail-rating-box">
+              <span class="rating-label">Overall Rating</span>
+              <div class="rating-display">
+                <span class="rating-number" id="detail-rating">0</span>
+                <span class="rating-max">/10</span>
+              </div>
+              <div class="rating-bar-wrap">
+                <div class="rating-bar" id="detail-rating-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Col 3: synopsis -->
+          <div class="detail-synopsis-col">
+            <h2 class="detail-section-title">Synopsis</h2>
+            <p id="detail-synopsis"></p>
+          </div>
+
+        </div>
+
+        <!-- My Opinion -->
+        <div class="detail-section">
+          <h2 class="detail-section-title">My Opinion</h2>
+          <p class="detail-opinion" id="detail-opinion"></p>
+        </div>
+
+        <!-- Official Site link -->
+        <div class="detail-section">
+          <h2 class="detail-section-title">Official Site</h2>
+          <a class="official-link" id="detail-official-link" href="#" target="_blank" rel="noopener noreferrer">
+            <span id="detail-official-label"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Highlights -->
+        <div class="detail-section">
+          <h2 class="detail-section-title">Highlights</h2>
+          <ul class="detail-highlights" id="detail-highlights"></ul>
+        </div>
+
+        <!-- Game-specific ratings (hidden when not applicable) -->
+        <div class="detail-section game-ratings-section" id="game-ratings-section" style="display:none">
+          <h2 class="detail-section-title">Game Ratings</h2>
+          <div class="game-ratings-grid" id="game-ratings-grid"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /#app -->
+
+  <script src="script.js"></script>
+</body>
+</html>
