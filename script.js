@@ -31,6 +31,7 @@ const reviews = [
     rating: 9.5,
     officialLink:  'https://store.steampowered.com/app/1245620/ELDEN_RING/',
     officialLabel: 'View on Steam',
+    trailer: 'E3Huy2cdih0',
     ratings: {
       Gameplay:   9.8,
       Sound:      8.5,
@@ -58,6 +59,7 @@ const reviews = [
     rating: 9.2,
     officialLink:  'https://store.steampowered.com/app/367520/Hollow_Knight/',
     officialLabel: 'View on Steam',
+    trailer: 'UAO2urG23S4',
     ratings: {
       Gameplay:   9.0,
       Sound:      9.5,
@@ -85,6 +87,7 @@ const reviews = [
     rating: 9.3,
     officialLink:  'https://www.rockstargames.com/reddeadredemption2/',
     officialLabel: 'View on Rockstar',
+    trailer: 'eaW0tYpxyp0',
     ratings: {
       Gameplay:   9.7,
       Sound:      8.8,
@@ -114,6 +117,7 @@ const reviews = [
     rating: 9.0,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    trailer: 'oKiYuIsPxYk',
     ratings: {
       Soundtrack: 9.5,
       Cast:       9.0,
@@ -141,6 +145,7 @@ const reviews = [
     rating: 9.4,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    trailer: 'RkNqrgx3dGQ',
     ratings: {
       Soundtrack: 8.5,
       Cast:       9.8,
@@ -168,6 +173,7 @@ const reviews = [
     rating: 9.1,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    trailer: 'uYPbbksJxIg',
     ratings: {
       Soundtrack: 9.7,
       Cast:       9.5,
@@ -197,6 +203,7 @@ const reviews = [
     rating: 9.3,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    trailer: 'KAOdjqyG37A',
     ratings: {
       Soundtrack: 9.0,
       Cast:       9.5,
@@ -224,6 +231,7 @@ const reviews = [
     rating: 9.5,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    trailer: 'y-cqqAJIXhs',
     ratings: {
       Soundtrack: 8.8,
       Cast:       9.8,
@@ -251,6 +259,7 @@ const reviews = [
     rating: 9.2,
     officialLink:  'https://www.netflix.com',
     officialLabel: 'Watch on Netflix',
+    trailer: 'uLtkt1IELNM',
     ratings: {
       Soundtrack: 9.3,
       Cast:       9.7,
@@ -280,6 +289,7 @@ const reviews = [
     rating: 9.0,
     officialLink:  'https://www.amazon.com/s?k=The+Stranger+Albert+Camus',
     officialLabel: 'Find on Amazon',
+    trailer: '',
     ratings: {
       Narrative:   9.5,
       Characters:  9.2,
@@ -306,6 +316,7 @@ const reviews = [
     rating: 9.7,
     officialLink:  'https://www.amazon.com/s?k=Dune+Frank+Herbert',
     officialLabel: 'Find on Amazon',
+    trailer: 'n9xhJrPXop4',
     ratings: {
       Narrative:   9.5,
       Characters:  9.0,
@@ -332,6 +343,7 @@ const reviews = [
     rating: 9.1,
     officialLink:  'https://www.amazon.com/s?k=Project+Hail+Mary+Andy+Weir',
     officialLabel: 'Find on Amazon',
+    trailer: '',
     ratings: {
       Narrative:   9.3,
       Characters:  9.5,
@@ -404,6 +416,8 @@ const ui = {
   ratingsSection:      $('ratings-section'),
   ratingsSectionTitle: $('ratings-section-title'),
   ratingsGrid:         $('ratings-grid'),
+  trailerSection:      $('trailer-section'),
+  detailTrailer:       $('detail-trailer'),
 };
 
 
@@ -416,6 +430,11 @@ const ui = {
  * @param {'landing'|'home'|'detail'} viewName - target view
  */
 function navigateTo(viewName) {
+  // Stop trailer when leaving detail view
+  if (state.currentView === 'detail' && viewName !== 'detail') {
+    ui.detailTrailer.src = '';
+  }
+
   // Hide the current view
   const current = views[state.currentView];
   current.classList.remove('active');
@@ -703,6 +722,15 @@ function showDetail(id) {
   // --- Official Site link ---
   ui.detailOfficialLink.href            = review.officialLink || '#';
   ui.detailOfficialLabel.textContent    = review.officialLabel || 'Official Site';
+
+  // --- Trailer ---
+  if (review.trailer) {
+    ui.trailerSection.style.display = 'block';
+    ui.detailTrailer.src = `https://www.youtube.com/embed/${review.trailer}`;
+  } else {
+    ui.trailerSection.style.display = 'none';
+    ui.detailTrailer.src = '';
+  }
 
   // --- Highlights ---
   ui.detailHighlights.innerHTML = review.highlights

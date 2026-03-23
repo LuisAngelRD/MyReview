@@ -184,16 +184,16 @@
 
         </div>
 
-        <!-- My Opinion -->
-        <div class="detail-section">
-          <h2 class="detail-section-title">My Opinion</h2>
-          <p class="detail-opinion" id="detail-opinion"></p>
-        </div>
-
         <!-- Category ratings (hidden when no ratings data) -->
         <div class="detail-section game-ratings-section" id="ratings-section" style="display:none">
           <h2 class="detail-section-title" id="ratings-section-title">Ratings</h2>
           <div class="game-ratings-grid" id="ratings-grid"></div>
+        </div>
+
+        <!-- My Opinion -->
+        <div class="detail-section">
+          <h2 class="detail-section-title">My Opinion</h2>
+          <p class="detail-opinion" id="detail-opinion"></p>
         </div>
 
         <!-- Highlights -->
@@ -211,6 +211,16 @@
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/>
             </svg>
           </a>
+        </div>
+
+        <!-- Trailer -->
+        <div class="detail-section" id="trailer-section" style="display:none">
+          <h2 class="detail-section-title">Trailer</h2>
+          <div class="trailer-wrapper">
+            <iframe id="detail-trailer" src="" frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
         </div>
 
       </div>
