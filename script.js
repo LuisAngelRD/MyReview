@@ -349,7 +349,6 @@ const reviews = [
 const state = {
   currentView: 'landing',   // 'landing' | 'home' | 'detail'
   activeCategory: 'all',    // active filter
-  carouselIndex: 0,         // current carousel position
   currentReview: null,      // active review in detail view
 };
 
@@ -385,9 +384,8 @@ const ui = {
   statTop:         $('stat-top'),
   // Home content
   sectionLabel:    $('section-label'),
-  carouselTrack:   $('carousel-track'),
-  carouselPrev:    $('carousel-prev'),
-  carouselNext:    $('carousel-next'),
+  heroSlides:      $('hero-slides'),
+  heroDots:        $('hero-dots'),
   reviewsGrid:     $('reviews-grid'),
   // Detail
   btnBack:         $('btn-back'),
@@ -439,20 +437,21 @@ function navigateTo(viewName) {
 /** Creates random floating particles in the background */
 function initParticles() {
   const container = $('particles');
-  const count = 55;
+  const count = 90;
 
   for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
 
     // Random size and position
-    const size = Math.random() * 7 + 3;
+    const size = Math.random() * 12 + 5;
+    const duration = Math.random() * 10 + 8;
     p.style.cssText = `
       width: ${size}px;
       height: ${size}px;
       left: ${Math.random() * 100}%;
-      animation-duration: ${Math.random() * 10 + 8}s;
-      animation-delay: ${Math.random() * 8}s;
+      animation-duration: ${duration}s;
+      animation-delay: -${Math.random() * duration}s;
       opacity: ${Math.random() * 0.5};
     `;
     container.appendChild(p);
@@ -480,40 +479,88 @@ function getFiltered(cat) {
   return cat === 'all' ? reviews : reviews.filter(r => r.category === cat);
 }
 
-/**
- * Renders the carousel with reviews from the active filter.
- * @param {Array} items - array of reviews to display
- */
-function renderCarousel(items) {
-  ui.carouselTrack.innerHTML = '';
-  state.carouselIndex = 0;
+/* ---- HBO-style Hero Carousel ---- */
 
-  items.forEach(review => {
-    const card = document.createElement('div');
-    card.className = 'carousel-card';
-    card.dataset.id = review.id;
+/** Featured items for the hero (no books) */
+const heroItems = reviews.filter(r => r.category !== 'books').slice(0, 3);
+let heroIndex = 0;
+let heroTimer = null;
 
-    card.innerHTML = `
-      <img src="${review.poster}" alt="${review.title}" loading="lazy" />
-      <div class="carousel-card-info">
-        <div class="carousel-card-cat">${review.category}</div>
-        <div class="carousel-card-name">${review.title}</div>
-        <div class="carousel-card-rating">★ ${review.rating}</div>
+/** Builds the hero carousel slides and dots */
+function renderHeroCarousel() {
+  ui.heroSlides.innerHTML = '';
+  ui.heroDots.innerHTML = '';
+
+  heroItems.forEach((review, i) => {
+    // Slide
+    const slide = document.createElement('div');
+    slide.className = 'hero-slide' + (i === 0 ? ' active' : '');
+    slide.style.backgroundImage = `url('${review.banner}')`;
+    slide.innerHTML = `
+      <div class="hero-slide-overlay"></div>
+      <div class="hero-slide-content">
+        <span class="hero-cat-badge">${review.category.toUpperCase()}</span>
+        <h2 class="hero-slide-title">${review.title}</h2>
+        <p class="hero-slide-year">${review.year}</p>
+        <p class="hero-slide-synopsis">${review.synopsis}</p>
+        <div class="hero-slide-actions">
+          <button class="hero-btn-review" data-id="${review.id}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+            </svg>
+            Read Review
+          </button>
+          <span class="hero-rating">★ ${review.rating}</span>
+        </div>
       </div>
     `;
+    ui.heroSlides.appendChild(slide);
 
-    // Click → detail view
-    card.addEventListener('click', () => showDetail(review.id));
-    ui.carouselTrack.appendChild(card);
+    // Dot
+    const dot = document.createElement('button');
+    dot.className = 'hero-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Slide ${i + 1}`);
+    dot.addEventListener('click', () => goToHeroSlide(i));
+    ui.heroDots.appendChild(dot);
   });
 
-  updateCarouselPosition();
+  // "Read Review" buttons
+  ui.heroSlides.querySelectorAll('.hero-btn-review').forEach(btn => {
+    btn.addEventListener('click', () => showDetail(Number(btn.dataset.id)));
+  });
+
+  startHeroTimer();
 }
 
-/**
- * Renders the grid of all reviews from the active filter.
- * @param {Array} items - array of reviews
- */
+function goToHeroSlide(index) {
+  const slides = ui.heroSlides.querySelectorAll('.hero-slide');
+  const dots   = ui.heroDots.querySelectorAll('.hero-dot');
+
+  slides[heroIndex].classList.remove('active');
+  dots[heroIndex].classList.remove('active');
+
+  heroIndex = index;
+
+  slides[heroIndex].classList.add('active');
+  dots[heroIndex].classList.add('active');
+
+  resetHeroTimer();
+}
+
+function nextHeroSlide() {
+  goToHeroSlide((heroIndex + 1) % heroItems.length);
+}
+
+function startHeroTimer() {
+  heroTimer = setInterval(nextHeroSlide, 15000);
+}
+
+function resetHeroTimer() {
+  clearInterval(heroTimer);
+  startHeroTimer();
+}
+
+/** Renders the grid of all reviews from the active filter */
 function renderGrid(items) {
   ui.reviewsGrid.innerHTML = '';
 
@@ -526,14 +573,14 @@ function renderGrid(items) {
     card.innerHTML = `
       <div class="review-card-img-wrap">
         <img src="${review.poster}" alt="${review.title}" loading="lazy" />
+        <div class="review-card-overlay">
+          <span class="review-overlay-rating">★ ${review.rating}</span>
+        </div>
       </div>
       <div class="review-card-body">
         <div class="review-cat-tag">${review.category}</div>
         <div class="review-card-title">${review.title}</div>
-        <div class="review-card-rating">
-          <span class="rating-pill">★ ${review.rating}</span>
-          <span>${review.year}</span>
-        </div>
+        <div class="review-card-year">${review.year}</div>
       </div>
     `;
 
@@ -542,17 +589,9 @@ function renderGrid(items) {
   });
 }
 
-/** Updates the horizontal scroll position of the carousel */
-function updateCarouselPosition() {
-  const cardW  = 220 + 16; // width + gap
-  const offset = state.carouselIndex * cardW;
-  ui.carouselTrack.style.transform = `translateX(-${offset}px)`;
-}
-
 /** Applies the category filter and re-renders home */
 function applyFilter(cat) {
   state.activeCategory = cat;
-  state.carouselIndex  = 0;
 
   const items = getFiltered(cat);
 
@@ -560,7 +599,16 @@ function applyFilter(cat) {
   const labels = { all: 'All Reviews', games: 'Games', movies: 'Movies', series: 'Series', books: 'Books' };
   ui.sectionLabel.textContent = labels[cat] || 'All Reviews';
 
-  renderCarousel(items);
+  // Show hero carousel only on "All"
+  const heroEl = document.getElementById('hero-carousel');
+  if (cat === 'all') {
+    heroEl.style.display = '';
+    startHeroTimer();
+  } else {
+    heroEl.style.display = 'none';
+    clearInterval(heroTimer);
+  }
+
   renderGrid(items);
 
   // Sync active buttons in header and sidebar
@@ -713,12 +761,14 @@ function capitalizeFirst(str) {
 /** Landing: "Let's go" button */
 ui.btnEnter.addEventListener('click', () => {
   navigateTo('home');
+  renderHeroCarousel();
   applyFilter('all');
   updateSidebarStats();
 });
 
 /** Header: logo → returns to landing */
 ui.btnLogo.addEventListener('click', () => {
+  clearInterval(heroTimer);
   navigateTo('landing');
 });
 
@@ -740,21 +790,6 @@ ui.sidebarItems.forEach(btn => {
 
 /** Sidebar overlay: close on outside click */
 ui.sidebarOverlay.addEventListener('click', closeSidebar);
-
-/** Carousel: navigation controls */
-ui.carouselPrev.addEventListener('click', () => {
-  const items   = getFiltered(state.activeCategory);
-  const maxIdx  = Math.max(0, items.length - 1);
-  state.carouselIndex = Math.max(0, state.carouselIndex - 1);
-  updateCarouselPosition();
-});
-
-ui.carouselNext.addEventListener('click', () => {
-  const items  = getFiltered(state.activeCategory);
-  const maxIdx = Math.max(0, items.length - 1);
-  state.carouselIndex = Math.min(maxIdx, state.carouselIndex + 1);
-  updateCarouselPosition();
-});
 
 /** Detail: back to home button */
 ui.btnBack.addEventListener('click', () => {
