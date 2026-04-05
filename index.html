@@ -9,6 +9,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
+
+  <!-- Firebase SDK (compat — no bundler needed) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -33,8 +38,9 @@
           <span class="title-brand">MyReview</span>
         </h1>
         <p class="landing-subtitle">
-          Honest reviews for games, movies, series &amp; books.<br/>
-          Curated by passion, not algorithms.
+          This is my personal review website, featuring honest reviews<br/>
+          of Games, Movies, TV shows, and Books.<br/>
+          Sometimes they're objective, sometimes subjective.
         </p>
         <button class="btn-cta" id="btn-enter">
           <span>Let's go</span>
@@ -69,6 +75,12 @@
             <button class="nav-filter" data-cat="series">Series</button>
             <button class="nav-filter" data-cat="books">Books</button>
           </nav>
+          <button class="user-icon-btn" id="btn-user" aria-label="Login" title="Sign in">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -100,6 +112,22 @@
                 <span class="sidebar-count" id="count-books">0</span>
               </button></li>
             </ul>
+
+            <div class="sidebar-divider"></div>
+
+            <button class="sidebar-add-btn auth-only" id="btn-add-review">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              Add Review
+            </button>
+
+            <button class="sidebar-add-btn sidebar-featured-btn auth-only" id="btn-featured">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              Featured Carousel
+            </button>
 
             <div class="sidebar-divider"></div>
 
@@ -148,6 +176,20 @@
           </svg>
           Back
         </button>
+        <div class="detail-actions auth-only">
+          <button class="detail-action-btn" id="btn-edit-review" title="Edit review">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="detail-action-btn detail-action-btn--delete" id="btn-delete-review" title="Delete review">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- Review content -->
@@ -226,8 +268,180 @@
       </div>
     </section>
 
+    <!-- =====================================================
+         VIEW 4: REVIEW FORM (Create / Edit)
+    ===================================================== -->
+    <section id="view-form" class="view">
+      <div class="form-container">
+        <div class="form-header">
+          <button class="back-btn" id="btn-form-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back
+          </button>
+          <h1 class="form-title" id="form-title">Add Review</h1>
+        </div>
+
+        <form id="review-form" class="review-form" autocomplete="off">
+
+          <!-- Basic info -->
+          <div class="form-section">
+            <h2 class="form-section-title">Basic Info</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="form-name">Title *</label>
+                <input type="text" id="form-name" required placeholder="e.g. Elden Ring" />
+              </div>
+              <div class="form-group">
+                <label for="form-year">Year *</label>
+                <input type="number" id="form-year" required min="1900" max="2100" placeholder="e.g. 2022" />
+              </div>
+              <div class="form-group">
+                <label for="form-category">Category *</label>
+                <select id="form-category" required>
+                  <option value="">Select category...</option>
+                  <option value="games">Games</option>
+                  <option value="movies">Movies</option>
+                  <option value="series">Series</option>
+                  <option value="books">Books</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="form-rating">Overall Rating (0-10) *</label>
+                <input type="number" id="form-rating" required min="0" max="10" step="0.1" placeholder="e.g. 9.5" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Images -->
+          <div class="form-section">
+            <h2 class="form-section-title">Images</h2>
+            <div class="form-grid">
+              <div class="form-group form-group--full">
+                <label for="form-poster">Poster URL *</label>
+                <input type="url" id="form-poster" required placeholder="https://..." />
+              </div>
+              <div class="form-group form-group--full">
+                <label for="form-banner">Banner URL *</label>
+                <input type="url" id="form-banner" required placeholder="https://..." />
+              </div>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="form-section">
+            <h2 class="form-section-title">Content</h2>
+            <div class="form-group">
+              <label for="form-synopsis">Synopsis *</label>
+              <textarea id="form-synopsis" required rows="4" placeholder="Write a short synopsis..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="form-opinion">My Opinion *</label>
+              <textarea id="form-opinion" required rows="5" placeholder="Write your personal opinion..."></textarea>
+            </div>
+          </div>
+
+          <!-- Highlights -->
+          <div class="form-section">
+            <h2 class="form-section-title">Highlights</h2>
+            <div id="form-highlights-list" class="form-highlights-list"></div>
+            <button type="button" class="form-add-btn" id="btn-add-highlight">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <path d="M12 5v14M5 12h14"/>
+              </svg>
+              Add Highlight
+            </button>
+          </div>
+
+          <!-- Category Ratings -->
+          <div class="form-section">
+            <h2 class="form-section-title">Category Ratings</h2>
+            <p class="form-hint" id="form-ratings-hint">Select a category first to see rating fields.</p>
+            <div id="form-ratings-grid" class="form-grid"></div>
+          </div>
+
+          <!-- Official Site -->
+          <div class="form-section">
+            <h2 class="form-section-title">Official Site</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="form-official-link">Official Site URL</label>
+                <input type="url" id="form-official-link" placeholder="https://..." />
+              </div>
+              <div class="form-group">
+                <label for="form-official-label">Button Label</label>
+                <input type="text" id="form-official-label" placeholder="e.g. View on Steam" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Trailer -->
+          <div class="form-section">
+            <h2 class="form-section-title">Trailer</h2>
+            <div class="form-group">
+              <label class="form-checkbox-label">
+                <input type="checkbox" id="form-has-trailer" checked />
+                <span>Include trailer</span>
+              </label>
+            </div>
+            <div class="form-group" id="form-trailer-group">
+              <label for="form-trailer">YouTube Video ID</label>
+              <input type="text" id="form-trailer" placeholder="e.g. E3Huy2cdih0" />
+              <span class="form-hint">The ID from the YouTube URL: youtube.com/watch?v=<strong>E3Huy2cdih0</strong></span>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="form-actions">
+            <button type="button" class="form-cancel-btn" id="btn-form-cancel">Cancel</button>
+            <button type="submit" class="form-submit-btn" id="btn-form-submit">Save Review</button>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="login-modal-overlay" id="login-modal" style="display:none">
+      <div class="login-modal">
+        <button type="button" class="login-modal-close" id="login-modal-close">&times;</button>
+        <h2 class="login-modal-title">Sign In</h2>
+        <form id="login-form" autocomplete="off">
+          <div class="login-form-group">
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" required placeholder="you@email.com" />
+          </div>
+          <div class="login-form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" required placeholder="Password" />
+          </div>
+          <p class="login-error" id="login-error"></p>
+          <button type="submit" class="login-submit-btn">Sign In</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Featured Carousel Modal -->
+    <div class="featured-modal-overlay" id="featured-modal" style="display:none">
+      <div class="featured-modal">
+        <button type="button" class="login-modal-close" id="featured-modal-close">&times;</button>
+        <h2 class="login-modal-title">Select Featured (3)</h2>
+        <p class="featured-hint">Choose 3 reviews to display in the home carousel.</p>
+        <div class="featured-search-wrap">
+          <input type="text" id="featured-search" placeholder="Search reviews..." class="featured-search" />
+        </div>
+        <div class="featured-list" id="featured-list"></div>
+        <div class="featured-footer">
+          <span class="featured-count" id="featured-count">0 / 3 selected</span>
+          <button class="form-submit-btn" id="btn-featured-save">Save</button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /#app -->
 
+  <script src="firebase-config.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

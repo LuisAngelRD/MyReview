@@ -11,7 +11,7 @@
    synopsis, opinion (personal take), highlights, rating,
    officialLink, officialLabel, and optionally ratings.
 ============================================================ */
-const reviews = [
+const defaultReviews = [
   /* ---- GAMES ---- */
   {
     id: 1,
@@ -354,14 +354,43 @@ const reviews = [
   },
 ];
 
+/** Reviews array — loaded from Firebase on init */
+let reviews = [];
+
+/** Persist a single review to Firebase */
+async function saveReviewToCloud(review) {
+  try {
+    await saveReviewToDB(review);
+  } catch (err) {
+    console.error('Firebase save error:', err);
+  }
+}
+
+/** Generate next available ID */
+function nextId() {
+  return reviews.length ? Math.max(...reviews.map(r => r.id)) + 1 : 1;
+}
+
+/** Rating fields per category */
+const categoryRatingFields = {
+  games:  ['Gameplay', 'Sound', 'Soundtrack', 'Characters', 'Narrative', 'Animations'],
+  movies: ['Soundtrack', 'Cast', 'Narrative', 'Characters', 'VFX', 'Script'],
+  series: ['Soundtrack', 'Cast', 'Narrative', 'Characters', 'VFX', 'Script'],
+  books:  ['Narrative', 'Characters', 'Originality', 'World', 'Pacing'],
+};
+
 
 /* ============================================================
    2. APPLICATION STATE
 ============================================================ */
 const state = {
-  currentView: 'landing',   // 'landing' | 'home' | 'detail'
+  currentView: 'landing',   // 'landing' | 'home' | 'detail' | 'form'
   activeCategory: 'all',    // active filter
   currentReview: null,      // active review in detail view
+  editingId: null,          // null = creating, number = editing
+  dataReady: false,         // true once Firebase data is loaded
+  isLoggedIn: false,        // true when authenticated
+  featuredIds: null,        // array of 3 review IDs for carousel, or null for default
 };
 
 
@@ -372,6 +401,7 @@ const $ = id => document.getElementById(id);
 
 const views = {
   landing: $('view-landing'),
+  form:    $('view-form'),
   home:    $('view-home'),
   detail:  $('view-detail'),
 };
@@ -418,6 +448,49 @@ const ui = {
   ratingsGrid:         $('ratings-grid'),
   trailerSection:      $('trailer-section'),
   detailTrailer:       $('detail-trailer'),
+  // Detail actions
+  btnEditReview:       $('btn-edit-review'),
+  btnDeleteReview:     $('btn-delete-review'),
+  // Sidebar add
+  btnAddReview:        $('btn-add-review'),
+  // Form
+  btnFormBack:         $('btn-form-back'),
+  btnFormCancel:       $('btn-form-cancel'),
+  formTitle:           $('form-title'),
+  reviewForm:          $('review-form'),
+  formName:            $('form-name'),
+  formYear:            $('form-year'),
+  formCategory:        $('form-category'),
+  formRating:          $('form-rating'),
+  formPoster:          $('form-poster'),
+  formBanner:          $('form-banner'),
+  formSynopsis:        $('form-synopsis'),
+  formOpinion:         $('form-opinion'),
+  formHighlightsList:  $('form-highlights-list'),
+  btnAddHighlight:     $('btn-add-highlight'),
+  formRatingsHint:     $('form-ratings-hint'),
+  formRatingsGrid:     $('form-ratings-grid'),
+  formOfficialLink:    $('form-official-link'),
+  formOfficialLabel:   $('form-official-label'),
+  formHasTrailer:      $('form-has-trailer'),
+  formTrailerGroup:    $('form-trailer-group'),
+  formTrailer:         $('form-trailer'),
+  // Auth
+  btnUser:         $('btn-user'),
+  loginModal:      $('login-modal'),
+  loginModalClose: $('login-modal-close'),
+  loginForm:       $('login-form'),
+  loginEmail:      $('login-email'),
+  loginPassword:   $('login-password'),
+  loginError:      $('login-error'),
+  // Featured modal
+  btnFeatured:         $('btn-featured'),
+  featuredModal:       $('featured-modal'),
+  featuredModalClose:  $('featured-modal-close'),
+  featuredList:        $('featured-list'),
+  featuredSearch:      $('featured-search'),
+  featuredCount:       $('featured-count'),
+  btnFeaturedSave:     $('btn-featured-save'),
 };
 
 
@@ -500,13 +573,24 @@ function getFiltered(cat) {
 
 /* ---- HBO-style Hero Carousel ---- */
 
-/** Featured items for the hero (no books) */
-const heroItems = reviews.filter(r => r.category !== 'books').slice(0, 3);
+/** Featured items for the hero (no books) — computed dynamically */
+let heroItems = [];
 let heroIndex = 0;
 let heroTimer = null;
 
 /** Builds the hero carousel slides and dots */
 function renderHeroCarousel() {
+  // Use manually selected featured items if available
+  if (state.featuredIds && state.featuredIds.length === 3) {
+    heroItems = state.featuredIds
+      .map(id => reviews.find(r => r.id === id))
+      .filter(Boolean);
+  }
+  // Fallback to first 3 non-book reviews
+  if (heroItems.length < 3) {
+    heroItems = reviews.filter(r => r.category !== 'books').slice(0, 3);
+  }
+  heroIndex = 0;
   ui.heroSlides.innerHTML = '';
   ui.heroDots.innerHTML = '';
 
@@ -783,11 +867,202 @@ function capitalizeFirst(str) {
 
 
 /* ============================================================
-   9. EVENT LISTENERS
+   9. FORM / CRUD LOGIC
+============================================================ */
+
+/** Add a highlight input row */
+function addHighlightRow(value = '') {
+  const row = document.createElement('div');
+  row.className = 'form-highlight-row';
+  row.innerHTML = `
+    <input type="text" placeholder="Write a highlight..." value="${value.replace(/"/g, '&quot;')}" />
+    <button type="button" class="form-highlight-remove">&times;</button>
+  `;
+  row.querySelector('.form-highlight-remove').addEventListener('click', () => row.remove());
+  ui.formHighlightsList.appendChild(row);
+}
+
+/** Render category-specific rating fields */
+function renderFormRatings(category, existingRatings = {}) {
+  ui.formRatingsGrid.innerHTML = '';
+  const fields = categoryRatingFields[category];
+  if (!fields) {
+    ui.formRatingsHint.style.display = 'block';
+    return;
+  }
+  ui.formRatingsHint.style.display = 'none';
+  fields.forEach(field => {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    group.innerHTML = `
+      <label for="form-rat-${field}">${field}</label>
+      <input type="number" id="form-rat-${field}" min="0" max="10" step="0.1"
+        placeholder="0-10" value="${existingRatings[field] ?? ''}" />
+    `;
+    ui.formRatingsGrid.appendChild(group);
+  });
+}
+
+/** Open form for creating a new review */
+function openCreateForm() {
+  state.editingId = null;
+  ui.formTitle.textContent = 'Add Review';
+  ui.reviewForm.reset();
+  ui.formHighlightsList.innerHTML = '';
+  addHighlightRow();
+  ui.formRatingsGrid.innerHTML = '';
+  ui.formRatingsHint.style.display = 'block';
+  ui.formHasTrailer.checked = true;
+  ui.formTrailerGroup.style.display = '';
+  navigateTo('form');
+}
+
+/** Open form for editing an existing review */
+function openEditForm(review) {
+  state.editingId = review.id;
+  ui.formTitle.textContent = 'Edit Review';
+
+  ui.formName.value      = review.title;
+  ui.formYear.value      = review.year;
+  ui.formCategory.value  = review.category;
+  ui.formRating.value    = review.rating;
+  ui.formPoster.value    = review.poster;
+  ui.formBanner.value    = review.banner;
+  ui.formSynopsis.value  = review.synopsis;
+  ui.formOpinion.value   = review.opinion;
+  ui.formOfficialLink.value  = review.officialLink || '';
+  ui.formOfficialLabel.value = review.officialLabel || '';
+
+  // Highlights
+  ui.formHighlightsList.innerHTML = '';
+  (review.highlights || []).forEach(h => addHighlightRow(h));
+  if (!review.highlights || review.highlights.length === 0) addHighlightRow();
+
+  // Category ratings
+  renderFormRatings(review.category, review.ratings || {});
+
+  // Trailer
+  const hasTrailer = !!review.trailer;
+  ui.formHasTrailer.checked = hasTrailer;
+  ui.formTrailerGroup.style.display = hasTrailer ? '' : 'none';
+  ui.formTrailer.value = review.trailer || '';
+
+  navigateTo('form');
+}
+
+/** Collect form data and save (create or update) */
+function handleFormSubmit(e) {
+  e.preventDefault();
+  if (!state.isLoggedIn) return;
+
+  const category = ui.formCategory.value;
+
+  // Collect highlights
+  const highlights = [];
+  ui.formHighlightsList.querySelectorAll('input').forEach(input => {
+    const val = input.value.trim();
+    if (val) highlights.push(val);
+  });
+
+  // Collect category ratings
+  const ratings = {};
+  const fields = categoryRatingFields[category] || [];
+  fields.forEach(field => {
+    const input = document.getElementById(`form-rat-${field}`);
+    if (input && input.value !== '') {
+      ratings[field] = parseFloat(input.value);
+    }
+  });
+
+  // Build review object
+  const reviewData = {
+    id:             state.editingId || nextId(),
+    category:       category,
+    title:          ui.formName.value.trim(),
+    year:           parseInt(ui.formYear.value),
+    poster:         ui.formPoster.value.trim(),
+    banner:         ui.formBanner.value.trim(),
+    synopsis:       ui.formSynopsis.value.trim(),
+    opinion:        ui.formOpinion.value.trim(),
+    highlights:     highlights,
+    rating:         parseFloat(ui.formRating.value),
+    officialLink:   ui.formOfficialLink.value.trim(),
+    officialLabel:  ui.formOfficialLabel.value.trim() || 'Official Site',
+    trailer:        ui.formHasTrailer.checked ? ui.formTrailer.value.trim() : '',
+    ratings:        Object.keys(ratings).length ? ratings : null,
+  };
+
+  if (state.editingId) {
+    // Update existing
+    const idx = reviews.findIndex(r => r.id === state.editingId);
+    if (idx !== -1) reviews[idx] = reviewData;
+  } else {
+    // Create new
+    reviews.push(reviewData);
+  }
+
+  // Save to Firebase
+  saveReviewToCloud(reviewData);
+  navigateTo('home');
+  applyFilter(state.activeCategory);
+  renderHeroCarousel();
+  updateSidebarStats();
+}
+
+/** Delete a review by ID */
+async function deleteReview(id) {
+  reviews = reviews.filter(r => r.id !== id);
+  try { await deleteReviewFromDB(id); } catch (err) { console.error('Firebase delete error:', err); }
+  navigateTo('home');
+  applyFilter(state.activeCategory);
+  renderHeroCarousel();
+  updateSidebarStats();
+}
+
+/** Show delete confirmation modal */
+function showDeleteModal(review) {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <h3>Delete Review</h3>
+      <p>Are you sure you want to delete "<strong>${review.title}</strong>"? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="modal-cancel-btn" id="modal-cancel">Cancel</button>
+        <button class="modal-delete-btn" id="modal-confirm">Delete</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('#modal-cancel').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#modal-confirm').addEventListener('click', () => {
+    overlay.remove();
+    deleteReview(review.id);
+  });
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
+
+/* ============================================================
+   10. EVENT LISTENERS
 ============================================================ */
 
 /** Landing: "Let's go" button */
-ui.btnEnter.addEventListener('click', () => {
+ui.btnEnter.addEventListener('click', async () => {
+  // Wait for Firebase data if not ready yet
+  if (!state.dataReady) {
+    try {
+      await seedIfEmpty(defaultReviews);
+      reviews = await loadReviewsFromDB();
+      state.featuredIds = await loadFeaturedFromDB();
+      state.dataReady = true;
+    } catch (err) {
+      console.error('Firebase load error:', err);
+      reviews = structuredClone(defaultReviews);
+      state.dataReady = true;
+    }
+  }
   navigateTo('home');
   renderHeroCarousel();
   applyFilter('all');
@@ -824,12 +1099,223 @@ ui.btnBack.addEventListener('click', () => {
   navigateTo('home');
 });
 
-/** Keyboard: Escape key closes sidebar or returns from detail */
+/** Detail: edit review button */
+ui.btnEditReview.addEventListener('click', () => {
+  if (!state.isLoggedIn) return;
+  if (state.currentReview) openEditForm(state.currentReview);
+});
+
+/** Detail: delete review button */
+ui.btnDeleteReview.addEventListener('click', () => {
+  if (!state.isLoggedIn) return;
+  if (state.currentReview) showDeleteModal(state.currentReview);
+});
+
+/** Sidebar: add review button */
+ui.btnAddReview.addEventListener('click', () => {
+  if (!state.isLoggedIn) return;
+  closeSidebar();
+  openCreateForm();
+});
+
+/** Form: back button */
+ui.btnFormBack.addEventListener('click', () => {
+  navigateTo('home');
+});
+
+/** Form: cancel button */
+ui.btnFormCancel.addEventListener('click', () => {
+  navigateTo('home');
+});
+
+/** Form: submit */
+ui.reviewForm.addEventListener('submit', handleFormSubmit);
+
+/** Form: add highlight button */
+ui.btnAddHighlight.addEventListener('click', () => addHighlightRow());
+
+/** Form: category change → update rating fields */
+ui.formCategory.addEventListener('change', () => {
+  renderFormRatings(ui.formCategory.value);
+});
+
+/** Form: trailer toggle */
+ui.formHasTrailer.addEventListener('change', () => {
+  ui.formTrailerGroup.style.display = ui.formHasTrailer.checked ? '' : 'none';
+});
+
+/* ============================================================
+   FEATURED CAROUSEL MODAL
+============================================================ */
+
+let featuredSelection = []; // temp selection in modal
+
+function openFeaturedModal() {
+  featuredSelection = state.featuredIds ? [...state.featuredIds] : [];
+  renderFeaturedList('');
+  updateFeaturedCount();
+  ui.featuredModal.style.display = '';
+  ui.featuredSearch.value = '';
+  ui.featuredSearch.focus();
+}
+
+function closeFeaturedModal() {
+  ui.featuredModal.style.display = 'none';
+}
+
+function renderFeaturedList(query) {
+  const q = query.toLowerCase().trim();
+  const filtered = reviews.filter(r => {
+    if (q && !r.title.toLowerCase().includes(q) && !r.category.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  ui.featuredList.innerHTML = '';
+  filtered.forEach(r => {
+    const isSelected = featuredSelection.includes(r.id);
+    const item = document.createElement('label');
+    item.className = 'featured-item' + (isSelected ? ' selected' : '');
+    item.innerHTML = `
+      <input type="checkbox" ${isSelected ? 'checked' : ''} data-id="${r.id}" />
+      <img src="${r.poster}" alt="${r.title}" class="featured-item-poster" />
+      <div class="featured-item-info">
+        <span class="featured-item-title">${r.title}</span>
+        <span class="featured-item-meta">${r.category.toUpperCase()} · ${r.year}</span>
+      </div>
+    `;
+    const checkbox = item.querySelector('input');
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        if (featuredSelection.length >= 3) {
+          checkbox.checked = false;
+          return;
+        }
+        featuredSelection.push(r.id);
+      } else {
+        featuredSelection = featuredSelection.filter(id => id !== r.id);
+      }
+      updateFeaturedCount();
+      // Update visual state of all items
+      ui.featuredList.querySelectorAll('.featured-item').forEach(el => {
+        const id = Number(el.querySelector('input').dataset.id);
+        el.classList.toggle('selected', featuredSelection.includes(id));
+      });
+    });
+    ui.featuredList.appendChild(item);
+  });
+}
+
+function updateFeaturedCount() {
+  ui.featuredCount.textContent = `${featuredSelection.length} / 3 selected`;
+  ui.btnFeaturedSave.disabled = featuredSelection.length !== 3;
+}
+
+async function saveFeatured() {
+  if (featuredSelection.length !== 3) return;
+  state.featuredIds = [...featuredSelection];
+  try {
+    await saveFeaturedToDB(state.featuredIds);
+  } catch (err) {
+    console.error('Error saving featured:', err);
+  }
+  closeFeaturedModal();
+  renderHeroCarousel();
+}
+
+// Event listeners for featured modal
+ui.btnFeatured.addEventListener('click', () => {
+  if (!state.isLoggedIn) return;
+  closeSidebar();
+  openFeaturedModal();
+});
+
+ui.featuredModalClose.addEventListener('click', closeFeaturedModal);
+
+ui.featuredModal.addEventListener('click', e => {
+  if (e.target === ui.featuredModal) closeFeaturedModal();
+});
+
+ui.featuredSearch.addEventListener('input', () => {
+  renderFeaturedList(ui.featuredSearch.value);
+});
+
+ui.btnFeaturedSave.addEventListener('click', saveFeatured);
+
+/* ============================================================
+   AUTH — Firebase Authentication
+============================================================ */
+
+/** Update UI based on authentication state */
+function updateAuthUI(user) {
+  state.isLoggedIn = !!user;
+  ui.btnUser.classList.toggle('logged-in', !!user);
+  ui.btnUser.title = user ? 'Signed in — click to sign out' : 'Sign in';
+  document.querySelectorAll('.auth-only').forEach(el => {
+    el.classList.toggle('auth-visible', !!user);
+  });
+}
+
+/** Listen for auth state changes */
+auth.onAuthStateChanged(user => {
+  updateAuthUI(user);
+});
+
+/** User icon: open login modal or sign out */
+ui.btnUser.addEventListener('click', () => {
+  if (state.isLoggedIn) {
+    auth.signOut();
+  } else {
+    ui.loginModal.style.display = '';
+    ui.loginEmail.focus();
+  }
+});
+
+/** Login modal: close button */
+ui.loginModalClose.addEventListener('click', () => {
+  ui.loginModal.style.display = 'none';
+  ui.loginError.textContent = '';
+  ui.loginForm.reset();
+});
+
+/** Login modal: close on overlay click */
+ui.loginModal.addEventListener('click', e => {
+  if (e.target === ui.loginModal) {
+    ui.loginModal.style.display = 'none';
+    ui.loginError.textContent = '';
+    ui.loginForm.reset();
+  }
+});
+
+/** Login form: submit */
+ui.loginForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    await auth.signInWithEmailAndPassword(
+      ui.loginEmail.value.trim(),
+      ui.loginPassword.value
+    );
+    ui.loginModal.style.display = 'none';
+    ui.loginError.textContent = '';
+    ui.loginForm.reset();
+  } catch (err) {
+    ui.loginError.textContent = 'Invalid email or password.';
+  }
+});
+
+/** Keyboard: Escape key closes modal, sidebar or returns from detail/form */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (ui.sidebar.classList.contains('open')) {
+    if (ui.featuredModal.style.display !== 'none') {
+      closeFeaturedModal();
+    } else if (ui.loginModal.style.display !== 'none') {
+      ui.loginModal.style.display = 'none';
+      ui.loginError.textContent = '';
+      ui.loginForm.reset();
+    } else if (ui.sidebar.classList.contains('open')) {
       closeSidebar();
     } else if (state.currentView === 'detail') {
+      navigateTo('home');
+    } else if (state.currentView === 'form') {
       navigateTo('home');
     }
   }
@@ -837,13 +1323,25 @@ document.addEventListener('keydown', e => {
 
 
 /* ============================================================
-   10. INITIALIZATION
+   11. INITIALIZATION
 ============================================================ */
 
 /** Application entry point */
-function init() {
+async function init() {
   initParticles();
   initParallax();
+
+  // Load reviews from Firebase (seed defaults if empty)
+  try {
+    await seedIfEmpty(defaultReviews);
+    reviews = await loadReviewsFromDB();
+    state.featuredIds = await loadFeaturedFromDB();
+  } catch (err) {
+    console.error('Firebase load error, using defaults:', err);
+    reviews = structuredClone(defaultReviews);
+  }
+
+  state.dataReady = true;
 
   // The initial view is landing (already has the 'active' class in HTML)
   state.currentView = 'landing';

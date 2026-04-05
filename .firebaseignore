@@ -1,0 +1,10 @@
+.claude/
+.agents/
+.git/
+.gitignore
+.firebaseignore
+firebase.json
+.firebaserc
+node_modules/
+serve_nocache.py
+*.md
